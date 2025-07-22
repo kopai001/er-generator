@@ -1,0 +1,252 @@
+erDiagram
+
+    ActionTxn {
+        number id PK
+        Date actionDate
+        string referenceNo
+    }
+
+    Checkpoint {
+        number id PK
+        string name
+        string code
+        enum type
+        CoordinatesCache coordinates
+        boolean isAvailable
+    }
+
+    ColumnTopic {
+        number id PK
+        string topicName
+        ColumnTopicTypeEnum type
+        string sysKey
+        string_array aliasList
+    }
+
+    DHrUser {
+        number id PK
+    }
+
+    EmployeeAlias {
+        number id PK
+        string fullname
+        number employeeId
+    }
+
+    EmployeeCheckpoint {
+        number id PK
+    }
+
+    EmployeeShiftPlan {
+        number id PK
+        Date startDate
+        Date endDate
+    }
+
+    EmployeeShift {
+        number id PK
+    }
+
+    Employee {
+        number id PK
+        string title
+        string firstname
+        string lastname
+        string nationalId
+        string accountNumber
+        string rawType
+        string level
+        string educationLevel
+        number salaryAmount
+        number positionAllowanceAmount
+        number compensationAmount
+    }
+
+    FaceScanRequest {
+        number id PK
+        enum type
+        string remark
+    }
+
+    Holiday {
+        number id PK
+        string name
+        string description
+        Date eventDate
+        string year
+    }
+
+    LeaveDayTxn {
+        number id PK
+        Date actionDate
+        boolean isHalf
+    }
+
+    LeaveRequest {
+        number id PK
+        string leaveNo
+        Date startDate
+        Date endDate
+        false nullable
+        enum type
+        string remark
+    }
+
+    PaySlipGroup {
+        number id PK
+        Date roundDate
+        Date transferDate
+        enum type
+        Date uploadDateTime
+        string documentName
+        number totalSuccessRecord
+        number totalRecord
+    }
+
+    PaySlipItem {
+        number id PK
+        ColumnTopicCache topicCache
+        PaySlipItemTypeEnum type
+        number amount
+    }
+
+    PaySlip {
+        number id PK
+        Date roundDate
+        Date transferDate
+        enum type
+        number totalIncomeAmount
+        number totalDeductionAmount
+        number grantTotalAmount
+        EmployeeCache employeeCache
+        EmployeeCache payer
+    }
+
+    PositionSlotTxn {
+        number id PK
+        Date actionDate
+        enum type
+        string remark
+        PositionSlotCache positionSlotCache
+    }
+
+    PositionSlot {
+        number id PK
+        string name
+        string positionNo
+        string code
+        boolean isTransfer
+        boolean isActive
+        string_array levelList
+    }
+
+    PositionTxn {
+        number id PK
+        Date actionDate
+        PositionSlotCache positionSlotCache
+        number salaryAmount
+        number positionAllowanceAmount
+        number compensationAmount
+        PositionTxnTypeEnum type
+        EmployeeCache employeeCache
+        string remark
+    }
+
+    PositionType {
+        number id PK
+        string name
+        string_array levelList
+    }
+
+    Position {
+        number id PK
+        string code
+        string name
+        string type
+        number positionTypeId
+        EmployeeTypeEnum employeeType
+    }
+
+    SalaryDocTemplateItem {
+        number id PK
+        string columnName
+    }
+
+    SalaryDocTemplate {
+        number id PK
+        enum type
+        number startRow
+    }
+
+    SalaryTxn {
+        number id PK
+        Date actionDate
+        number salaryAmount
+        number positionAllowanceAmount
+        number compensationAmount
+        EmployeeCache employeeCache
+        string remark
+        enum type
+    }
+
+    Shift {
+        number id PK
+        string name
+        false nullable
+        string startWorkingTime
+        string endWorkingTime
+        string lateWorkingTime
+    }
+
+    TemporaryAssignmentTxn {
+        number id PK
+        Date actionDate
+        Date startDate
+        Date endDate
+        TemporaryAssignmentTypeEnum type
+        EmployeeCache employeeCache
+        PositionCache positionCache
+        OrgUnitCache orgUnitCache
+        string remark
+    }
+
+    TimeAttendance {
+        number id PK
+        Date authenDateTime
+        false nullable
+        Date workingDateTime
+        CheckpointCache checkpoint
+    }
+
+    ActionTxn ||--o{ PositionTxn : "positionTxnList"
+    ActionTxn ||--o{ SalaryTxn : "salaryTxnList"
+    DHrUser ||--|| Employee : "employee"
+    EmployeeAlias }o--|| Employee : "employee"
+    EmployeeCheckpoint }o--|| Employee : "employee"
+    EmployeeShift }o--|| Shift : "shift"
+    EmployeeShift }o--|| Employee : "employee"
+    Employee ||--o{ PaySlip : "paySlipList"
+    Employee ||--o{ EmployeeAlias : "aliasList"
+    Employee ||--o{ LeaveRequest : "leaveRequestList"
+    Employee ||--o{ EmployeeShift : "employeeShiftList"
+    Employee ||--|| DHrUser : "dHrUser"
+    Employee ||--|| PositionSlot : "positionSlot"
+    FaceScanRequest }o--|| Employee : "employee"
+    LeaveDayTxn }o--|| LeaveRequest : "leaveRequest"
+    LeaveRequest ||--o{ LeaveDayTxn : "leaveDayTxnList"
+    LeaveRequest }o--|| Employee : "employee"
+    PaySlipGroup ||--o{ PaySlip : "paySlipList"
+    PaySlipItem }o--|| PaySlip : "paySlip"
+    PaySlip ||--o{ PaySlipItem : "itemList"
+    PaySlip }o--|| Employee : "employee"
+    PaySlip }o--|| PaySlipGroup : "paySlipGroup"
+    PositionSlotTxn }o--|| ActionTxn : "actionTxn"
+    PositionSlot }o--|| Position : "position"
+    PositionSlot ||--|| Employee : "employee"
+    PositionTxn }o--|| ActionTxn : "actionTxn"
+    PositionType ||--o{ Position : "positionList"
+    Position ||--o{ PositionSlot : "positionSlotList"
+    Position }o--|| PositionType : "positionType"
+    SalaryTxn }o--|| ActionTxn : "actionTxn"
+    Shift ||--o{ EmployeeShift : "employeeShiftList"
+    TimeAttendance }o--|| Employee : "employee"

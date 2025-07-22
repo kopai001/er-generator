@@ -1,0 +1,4 @@
+export enum PaySlipStatusEnum {
+  WAITING_TRANSFER = 'WAITING_TRANSFER',
+  TRANSFRED = 'TRANSFRED',
+}

@@ -1,0 +1,23 @@
+{
+    "name": "er-diagram-generator",
+    "version": "1.0.0",
+    "description": "A Node.js tool to generate ER diagrams from TypeScript entity files",
+    "main": "generate-er-diagram.js",
+    "scripts": {
+        "generate": "node generate-er-diagram.js",
+        "start": "node generate-er-diagram.js"
+    },
+    "keywords": [
+        "entity",
+        "relationship",
+        "diagram",
+        "typescript",
+        "typeorm",
+        "mermaid"
+    ],
+    "author": "ER Generator",
+    "license": "MIT",
+    "engines": {
+        "node": ">=12.0.0"
+    }
+}

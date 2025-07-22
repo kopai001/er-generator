@@ -1,0 +1,5 @@
+export enum TxnStatusEnum {
+  WAITING_APPROVE = 'WAITING_APPROVE',
+  COMPLETED = 'COMPLETED',
+  REJECTED = 'REJECTED',
+}
