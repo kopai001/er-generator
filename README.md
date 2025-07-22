@@ -5,13 +5,20 @@ A Node.js tool that automatically generates Entity Relationship (ER) diagrams fr
 ## Features
 
 - 📊 **Automatic Parsing**: Reads TypeScript entity files and extracts relationships
-- 🎨 **Beautiful HTML Output**: Generates interactive HTML diagrams using Mermaid.js
+- 🎨 **Interactive HTML Output**: Generates zoomable, pannable HTML diagrams using Mermaid.js
 - 🔗 **Relationship Detection**: Supports all TypeORM relationship types:
   - `@OneToMany` / `@ManyToOne`
   - `@OneToOne`
   - `@ManyToMany`
 - 📝 **Mermaid Export**: Also generates raw Mermaid syntax for further customization
 - 🎯 **Enum Support**: Detects and includes enum types in the diagram
+- 🏗️ **Advanced Entity Patterns**: Handles complex inheritance patterns:
+  - Base classes with `EntityNameBase` pattern
+  - Embedded column types
+  - Multiple decorator formats
+  - Transient properties
+- 🔍 **Interactive Navigation**: Zoom, pan, fullscreen, and keyboard shortcuts
+- 📱 **Mobile Friendly**: Touch gestures and responsive design
 
 ## Project Structure
 
@@ -49,17 +56,20 @@ A Node.js tool that automatically generates Entity Relationship (ER) diagrams fr
 
 The generator recognizes these TypeORM decorators:
 
-- `@Entity()` - Entity class definitions
-- `@PrimaryGeneratedColumn()` - Primary key columns
-- `@Column()` - Regular columns
+- `@Entity()` or `@Entity('table_name')` - Entity class definitions
+- `@PrimaryGeneratedColumn()` - Auto-generated primary key columns
+- `@PrimaryColumn()` - Custom primary key columns
+- `@Column()` - Regular columns (including embedded columns)
 - `@OneToMany()` - One-to-many relationships
 - `@ManyToOne()` - Many-to-one relationships
 - `@OneToOne()` - One-to-one relationships
 - `@ManyToMany()` - Many-to-many relationships
 - `@JoinColumn()` - Foreign key specifications
+- `@Expose()` - Transient properties (ignored in diagram)
 
 ## Example Entity Structure
 
+### Simple Entity
 ```typescript
 @Entity()
 export class Employee extends StampableEntity {
@@ -75,6 +85,28 @@ export class Employee extends StampableEntity {
   @ManyToOne(() => Position, (position) => position.employeeList)
   position: Position;
 }
+```
+
+### Advanced Entity with Base Class
+```typescript
+// Base class with all the columns and relationships
+class FarmerLandBase {
+  @Column({ name: 'Zone_Value', nullable: true })
+  zone: string;
+
+  @Column(() => TextFormDataSourceEmbedded, { prefix: 'Zone_' })
+  zoneDataSource: TextFormDataSourceEmbedded;
+
+  @OneToMany(() => ActivityLog, (log) => log.farmerLand)
+  activityLogList: ActivityLog[];
+
+  @Expose() // Transient property - ignored in diagram
+  serialNo: string;
+}
+
+// Entity class that extends the base
+@Entity('T_EUDR_FarmerLandsTables')
+export class FarmerLand extends mixin(FarmerLandBase, StampableV2Entity) { }
 ```
 
 ## Generated Statistics

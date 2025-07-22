@@ -2,9 +2,9 @@
 models/
 enums/
 
-# Generated diagram files (optional - you may want to commit these)
-# er-diagram.html
-# er-diagram.mmd
+# Generated diagram files - these are output results
+er-diagram.html
+er-diagram.mmd
 
 # Node.js dependencies
 node_modules/

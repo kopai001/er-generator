@@ -9,8 +9,10 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
             background-color: #f5f5f5;
+            overflow-x: hidden;
         }
         .container {
             max-width: 100%;
@@ -25,10 +27,69 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        .diagram-container {
-            text-align: center;
-            overflow-x: auto;
+        .diagram-wrapper {
+            position: relative;
             margin: 20px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            overflow: hidden;
+        }
+        .zoom-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .zoom-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .zoom-btn:hover {
+            background: #0056b3;
+        }
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+        .zoom-level {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            font-size: 12px;
+            min-width: 60px;
+        }
+        .diagram-container {
+            width: 100%;
+            height: 80vh;
+            overflow: auto;
+            cursor: grab;
+            user-select: none;
+            position: relative;
+        }
+        .diagram-container:active {
+            cursor: grabbing;
+        }
+        .diagram-container .mermaid {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+            transform-origin: top left;
+            min-width: 100%;
+            min-height: 100%;
         }
         .stats {
             display: grid;
@@ -63,305 +124,421 @@
             display: inline-block;
             margin-right: 10px;
         }
+        .instructions {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions h4 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Entity Relationship Diagram</h1>
+        <h1>🗺️ Interactive Entity Relationship Diagram</h1>
         
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-number">27</div>
+                <div class="stat-number">18</div>
                 <div class="stat-label">Entities</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">34</div>
+                <div class="stat-number">32</div>
                 <div class="stat-label">Relationships</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">15</div>
+                <div class="stat-number">7</div>
                 <div class="stat-label">Enums</div>
             </div>
         </div>
 
-        <div class="diagram-container">
-            <div class="mermaid">
+        <div class="instructions">
+            <h4>🎮 Navigation Controls:</h4>
+            <ul>
+                <li><strong>Zoom:</strong> Use +/- buttons, mouse wheel, or pinch on mobile</li>
+                <li><strong>Pan:</strong> Click and drag to move around the diagram</li>
+                <li><strong>Reset:</strong> Click "Fit" to reset zoom and center the diagram</li>
+                <li><strong>Full Screen:</strong> Click "⛶" for full screen mode</li>
+            </ul>
+        </div>
+
+        <div class="diagram-wrapper">
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                <button class="zoom-btn" onclick="zoomOut()">−</button>
+                <button class="zoom-level" id="zoomLevel">100%</button>
+                <button class="zoom-btn" onclick="resetZoom()">Fit</button>
+                <button class="zoom-btn" onclick="toggleFullscreen()">⛶</button>
+            </div>
+            <div class="diagram-container" id="diagramContainer">
+                <div class="mermaid" id="mermaidDiagram">
 erDiagram
 
-    ActionTxn {
-        number id PK
-        Date actionDate
-        string referenceNo
-    }
-
-    Checkpoint {
+    Action {
         number id PK
         string name
+        string nextActivityName
+    }
+
+    ActivityLog {
+        number id PK
+        string activityName
+        string action
+        Date actionDate
+        string actionBy
+        string actionByDisplayName
+        string comment
+    }
+
+    Activity {
+        number id PK
+        string name
+    }
+
+    CertificateDocumentType {
+        number id PK
         string code
-        enum type
-        CoordinatesCache coordinates
-        boolean isAvailable
+        string name
+        number stfsId
     }
 
-    ColumnTopic {
+    DocumentType {
         number id PK
-        string topicName
-        ColumnTopicTypeEnum type
-        string sysKey
-        string_array aliasList
+        string code
+        string name
+        ReferenceDocumentGroupEnum group
     }
 
-    DHrUser {
+    FarmerInfo {
         number id PK
     }
 
-    EmployeeAlias {
+    FarmerLand {
         number id PK
-        string fullname
-        number employeeId
+        string no
+        string ref
+        string status
+        number statusFlag
+        boolean isValidatingStatus
+        boolean isFarmerRelatedToFarmBookOwner
+        Date dataDate
+        string stfsGid
     }
 
-    EmployeeCheckpoint {
+    FarmerRegistrationType {
+        number id PK
+        string code
+        string name
+    }
+
+    History {
+        string action
+        string actionBy
+        Date actionDate
+    }
+
+    MModule {
         number id PK
     }
 
-    EmployeeShiftPlan {
-        number id PK
-        Date startDate
-        Date endDate
-    }
-
-    EmployeeShift {
-        number id PK
-    }
-
-    Employee {
+    ProcurementRecord {
         number id PK
         string title
-        string firstname
-        string lastname
-        string nationalId
-        string accountNumber
-        string rawType
-        string level
-        string educationLevel
-        number salaryAmount
-        number positionAllowanceAmount
-        number compensationAmount
+        string submissionId
+        string jotFormSubmissionId
+        Date fillDate
+        string referenceNo
+        int type
+        string farmerPersonCode
+        string teamCode
+        string userCode
+        string verifiedBy
+        string verifiedByName
+        Date verifiedDate
+        Date firstAssignedDate
+        string firstAssignedTo
+        Date latestAssignedDate
+        boolean isVendorInvalid
+        boolean isVendorVerified
+        boolean isBypass
+        boolean isPendingVerified
+        string status
+        number statusFlag
+        string assignee
+        Date dataDate
     }
 
-    FaceScanRequest {
-        number id PK
-        enum type
-        string remark
+    ReferenceDocument {
+        string id PK
+        string fileName
+        string fileType
+        string url
+        string fileId
+        boolean isDeletable
+        boolean confirmed
+        Date dataDate
+        string status
+        number statusFlag
     }
 
-    Holiday {
+    ReferenceInfo {
         number id PK
-        string name
-        string description
-        Date eventDate
-        string year
+        ReferenceInfoTypeEnum infoType
+        string field
+        string value
+        number correctionPercent
     }
 
-    LeaveDayTxn {
+    RpaUser {
         number id PK
-        Date actionDate
-        boolean isHalf
-    }
-
-    LeaveRequest {
-        number id PK
-        string leaveNo
-        Date startDate
-        Date endDate
-        false nullable
-        enum type
-        string remark
-    }
-
-    PaySlipGroup {
-        number id PK
-        Date roundDate
-        Date transferDate
-        enum type
-        Date uploadDateTime
-        string documentName
-        number totalSuccessRecord
-        number totalRecord
-    }
-
-    PaySlipItem {
-        number id PK
-        ColumnTopicCache topicCache
-        PaySlipItemTypeEnum type
-        number amount
-    }
-
-    PaySlip {
-        number id PK
-        Date roundDate
-        Date transferDate
-        enum type
-        number totalIncomeAmount
-        number totalDeductionAmount
-        number grantTotalAmount
-        EmployeeCache employeeCache
-        EmployeeCache payer
-    }
-
-    PositionSlotTxn {
-        number id PK
-        Date actionDate
-        enum type
-        string remark
-        PositionSlotCache positionSlotCache
-    }
-
-    PositionSlot {
-        number id PK
-        string name
-        string positionNo
+        string phone
         string code
-        boolean isTransfer
+        string accountName
         boolean isActive
-        string_array levelList
+        simple_array type
     }
 
-    PositionTxn {
-        number id PK
-        Date actionDate
-        PositionSlotCache positionSlotCache
-        number salaryAmount
-        number positionAllowanceAmount
-        number compensationAmount
-        PositionTxnTypeEnum type
-        EmployeeCache employeeCache
-        string remark
-    }
-
-    PositionType {
+    RubberVariety {
         number id PK
         string name
-        string_array levelList
+        number countryId
+        number stfsId
     }
 
-    Position {
+    SelectedReferenceInfo {
+        number procurementRecordId PK
+    }
+
+    SubModule {
         number id PK
         string code
         string name
-        string type
-        number positionTypeId
-        EmployeeTypeEnum employeeType
     }
 
-    SalaryDocTemplateItem {
-        number id PK
-        string columnName
+    Task {
+        string id PK
+        string serialNo
+        string referenceNo
+        string title
+        string activityName
+        Date assignedDate
+        Date dueDate
+        number taskAssigning
+        string moduleCode
+        number moduleId
+        string subModuleCode
+        number subModuleId
     }
 
-    SalaryDocTemplate {
-        number id PK
-        enum type
-        number startRow
-    }
+    Action }o--|| MModule : "e"
+    Action }o--|| SubModule : "e"
+    Action }o--|| Activity : "e"
+    ActivityLog }o--|| ProcurementRecord : "e"
+    ActivityLog }o--|| FarmerLand : "e"
+    Activity }o--|| MModule : "e"
+    Activity }o--|| SubModule : "e"
+    Activity ||--o{ Action : "actionList"
+    CertificateDocumentType }o--|| MModule : "e"
+    CertificateDocumentType }o--|| MModule : "e"
+    DocumentType }o--|| MModule : "e"
+    DocumentType }o--|| SubModule : "e"
+    DocumentType ||--o{ ReferenceDocument : "referenceDocumentList"
+    FarmerLand ||--o{ ActivityLog : "activityLogList"
+    FarmerLand ||--o{ ReferenceDocument : "referenceDocumentList"
+    FarmerRegistrationType }o--|| MModule : "e"
+    FarmerRegistrationType }o--|| MModule : "e"
+    ProcurementRecord }o--|| FarmerInfo : "e"
+    ProcurementRecord ||--o{ FarmerLand : "farmerLandList"
+    ProcurementRecord ||--o{ ActivityLog : "activityLogList"
+    ProcurementRecord ||--o{ ReferenceDocument : "referenceDocumentList"
+    ReferenceDocument }o--|| ProcurementRecord : "e"
+    ReferenceDocument }o--|| FarmerLand : "e"
+    ReferenceDocument }o--|| FarmerInfo : "e"
+    ReferenceDocument }o--|| DocumentType : "e"
+    RpaUser ||--o{ ActivityLog : "activityList"
+    SubModule }o--|| MModule : "e"
+    SubModule ||--o{ DocumentType : "documentTypeList"
+    SubModule ||--o{ FarmerRegistrationType : "farmerRegistrationTypeList"
+    SubModule ||--o{ CertificateDocumentType : "certificateDocumentTypeList"
+    SubModule ||--o{ Activity : "activityList"
+    SubModule ||--o{ Action : "actionList"
 
-    SalaryTxn {
-        number id PK
-        Date actionDate
-        number salaryAmount
-        number positionAllowanceAmount
-        number compensationAmount
-        EmployeeCache employeeCache
-        string remark
-        enum type
-    }
-
-    Shift {
-        number id PK
-        string name
-        false nullable
-        string startWorkingTime
-        string endWorkingTime
-        string lateWorkingTime
-    }
-
-    TemporaryAssignmentTxn {
-        number id PK
-        Date actionDate
-        Date startDate
-        Date endDate
-        TemporaryAssignmentTypeEnum type
-        EmployeeCache employeeCache
-        PositionCache positionCache
-        OrgUnitCache orgUnitCache
-        string remark
-    }
-
-    TimeAttendance {
-        number id PK
-        Date authenDateTime
-        false nullable
-        Date workingDateTime
-        CheckpointCache checkpoint
-    }
-
-    ActionTxn ||--o{ PositionTxn : "positionTxnList"
-    ActionTxn ||--o{ SalaryTxn : "salaryTxnList"
-    DHrUser ||--|| Employee : "employee"
-    EmployeeAlias }o--|| Employee : "employee"
-    EmployeeCheckpoint }o--|| Employee : "employee"
-    EmployeeShift }o--|| Shift : "shift"
-    EmployeeShift }o--|| Employee : "employee"
-    Employee ||--o{ PaySlip : "paySlipList"
-    Employee ||--o{ EmployeeAlias : "aliasList"
-    Employee ||--o{ LeaveRequest : "leaveRequestList"
-    Employee ||--o{ EmployeeShift : "employeeShiftList"
-    Employee ||--|| DHrUser : "dHrUser"
-    Employee ||--|| PositionSlot : "positionSlot"
-    FaceScanRequest }o--|| Employee : "employee"
-    LeaveDayTxn }o--|| LeaveRequest : "leaveRequest"
-    LeaveRequest ||--o{ LeaveDayTxn : "leaveDayTxnList"
-    LeaveRequest }o--|| Employee : "employee"
-    PaySlipGroup ||--o{ PaySlip : "paySlipList"
-    PaySlipItem }o--|| PaySlip : "paySlip"
-    PaySlip ||--o{ PaySlipItem : "itemList"
-    PaySlip }o--|| Employee : "employee"
-    PaySlip }o--|| PaySlipGroup : "paySlipGroup"
-    PositionSlotTxn }o--|| ActionTxn : "actionTxn"
-    PositionSlot }o--|| Position : "position"
-    PositionSlot ||--|| Employee : "employee"
-    PositionTxn }o--|| ActionTxn : "actionTxn"
-    PositionType ||--o{ Position : "positionList"
-    Position ||--o{ PositionSlot : "positionSlotList"
-    Position }o--|| PositionType : "positionType"
-    SalaryTxn }o--|| ActionTxn : "actionTxn"
-    Shift ||--o{ EmployeeShift : "employeeShiftList"
-    TimeAttendance }o--|| Employee : "employee"
-
+                </div>
             </div>
         </div>
 
         <div class="entity-list">
-            <h3>Entities:</h3>
-            <span class="entity-item">ActionTxn</span><span class="entity-item">Checkpoint</span><span class="entity-item">ColumnTopic</span><span class="entity-item">DHrUser</span><span class="entity-item">EmployeeAlias</span><span class="entity-item">EmployeeCheckpoint</span><span class="entity-item">EmployeeShiftPlan</span><span class="entity-item">EmployeeShift</span><span class="entity-item">Employee</span><span class="entity-item">FaceScanRequest</span><span class="entity-item">Holiday</span><span class="entity-item">LeaveDayTxn</span><span class="entity-item">LeaveRequest</span><span class="entity-item">PaySlipGroup</span><span class="entity-item">PaySlipItem</span><span class="entity-item">PaySlip</span><span class="entity-item">PositionSlotTxn</span><span class="entity-item">PositionSlot</span><span class="entity-item">PositionTxn</span><span class="entity-item">PositionType</span><span class="entity-item">Position</span><span class="entity-item">SalaryDocTemplateItem</span><span class="entity-item">SalaryDocTemplate</span><span class="entity-item">SalaryTxn</span><span class="entity-item">Shift</span><span class="entity-item">TemporaryAssignmentTxn</span><span class="entity-item">TimeAttendance</span>
+            <h3>📋 Entities:</h3>
+            <span class="entity-item">Action</span><span class="entity-item">ActivityLog</span><span class="entity-item">Activity</span><span class="entity-item">CertificateDocumentType</span><span class="entity-item">DocumentType</span><span class="entity-item">FarmerInfo</span><span class="entity-item">FarmerLand</span><span class="entity-item">FarmerRegistrationType</span><span class="entity-item">History</span><span class="entity-item">MModule</span><span class="entity-item">ProcurementRecord</span><span class="entity-item">ReferenceDocument</span><span class="entity-item">ReferenceInfo</span><span class="entity-item">RpaUser</span><span class="entity-item">RubberVariety</span><span class="entity-item">SelectedReferenceInfo</span><span class="entity-item">SubModule</span><span class="entity-item">Task</span>
         </div>
 
         <div class="entity-list">
-            <h3>Enums:</h3>
-            <span class="entity-item">CheckpointTypeEnum</span><span class="entity-item">ColumnTopicTypeEnum</span><span class="entity-item">DirectionEnum</span><span class="entity-item">EmployeeTypeEnum</span><span class="entity-item">FaceScanRequestStatusEnum</span><span class="entity-item">FaceScanRequestTypeEnum</span><span class="entity-item">LeaveStatusEnum</span><span class="entity-item">LeaveTypeEnum</span><span class="entity-item">PaySlipGroupStatusEnum</span><span class="entity-item">PaySlipStatusEnum</span><span class="entity-item">PositionSlotHistoryTypeEnum</span><span class="entity-item">PositionTxnTypeEnum</span><span class="entity-item">ShiftTypeEnum</span><span class="entity-item">TemporaryAssignmentTypeEnum</span><span class="entity-item">TxnStatusEnum</span>
+            <h3>🏷️ Enums:</h3>
+            <span class="entity-item">ActionEnum</span><span class="entity-item">ActivityEnum</span><span class="entity-item">ModuleTypeEnum</span><span class="entity-item">ReferenceDocumentGroupEnum</span><span class="entity-item">ReferenceInfoTypeEnum</span><span class="entity-item">RoleEnum</span><span class="entity-item">TaskDueDateStatusEnum</span>
         </div>
     </div>
 
     <script>
+        // Mermaid configuration
         mermaid.initialize({ 
             startOnLoad: true,
             theme: 'default',
             er: {
                 fontSize: 12,
-                useMaxWidth: true
+                useMaxWidth: false
             }
         });
+
+        // Zoom and pan functionality
+        let currentZoom = 1;
+        let isPanning = false;
+        let panStart = { x: 0, y: 0 };
+        let panOffset = { x: 0, y: 0 };
+
+        const container = document.getElementById('diagramContainer');
+        const diagram = document.getElementById('mermaidDiagram');
+        const zoomLevelDisplay = document.getElementById('zoomLevel');
+
+        function updateZoomDisplay() {
+            zoomLevelDisplay.textContent = Math.round(currentZoom * 100) + '%';
+        }
+
+        function applyTransform() {
+            diagram.style.transform = `scale(${currentZoom}) translate(${panOffset.x}px, ${panOffset.y}px)`;
+        }
+
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom * 1.2, 5);
+            applyTransform();
+            updateZoomDisplay();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom / 1.2, 0.1);
+            applyTransform();
+            updateZoomDisplay();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            panOffset = { x: 0, y: 0 };
+            applyTransform();
+            updateZoomDisplay();
+            container.scrollTo(0, 0);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                container.parentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Mouse wheel zoom
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            currentZoom = Math.min(Math.max(currentZoom * delta, 0.1), 5);
+            applyTransform();
+            updateZoomDisplay();
+        });
+
+        // Touch zoom (pinch)
+        let lastTouchDistance = 0;
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                lastTouchDistance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const distance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+                
+                if (lastTouchDistance > 0) {
+                    const delta = distance / lastTouchDistance;
+                    currentZoom = Math.min(Math.max(currentZoom * delta, 0.1), 5);
+                    applyTransform();
+                    updateZoomDisplay();
+                }
+                
+                lastTouchDistance = distance;
+            }
+        });
+
+        // Pan functionality
+        container.addEventListener('mousedown', (e) => {
+            if (e.button === 0) { // Left mouse button
+                isPanning = true;
+                panStart = { x: e.clientX, y: e.clientY };
+                container.style.cursor = 'grabbing';
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isPanning) {
+                const deltaX = (e.clientX - panStart.x) / currentZoom;
+                const deltaY = (e.clientY - panStart.y) / currentZoom;
+                panOffset.x += deltaX;
+                panOffset.y += deltaY;
+                applyTransform();
+                panStart = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isPanning) {
+                isPanning = false;
+                container.style.cursor = 'grab';
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '=':
+                    case '+':
+                        e.preventDefault();
+                        zoomIn();
+                        break;
+                    case '-':
+                        e.preventDefault();
+                        zoomOut();
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        resetZoom();
+                        break;
+                }
+            }
+        });
+
+        // Initialize
+        updateZoomDisplay();
     </script>
 </body>
 </html>

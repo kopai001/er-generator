@@ -1,252 +1,190 @@
 erDiagram
 
-    ActionTxn {
-        number id PK
-        Date actionDate
-        string referenceNo
-    }
-
-    Checkpoint {
+    Action {
         number id PK
         string name
+        string nextActivityName
+    }
+
+    ActivityLog {
+        number id PK
+        string activityName
+        string action
+        Date actionDate
+        string actionBy
+        string actionByDisplayName
+        string comment
+    }
+
+    Activity {
+        number id PK
+        string name
+    }
+
+    CertificateDocumentType {
+        number id PK
         string code
-        enum type
-        CoordinatesCache coordinates
-        boolean isAvailable
+        string name
+        number stfsId
     }
 
-    ColumnTopic {
+    DocumentType {
         number id PK
-        string topicName
-        ColumnTopicTypeEnum type
-        string sysKey
-        string_array aliasList
+        string code
+        string name
+        ReferenceDocumentGroupEnum group
     }
 
-    DHrUser {
+    FarmerInfo {
         number id PK
     }
 
-    EmployeeAlias {
+    FarmerLand {
         number id PK
-        string fullname
-        number employeeId
+        string no
+        string ref
+        string status
+        number statusFlag
+        boolean isValidatingStatus
+        boolean isFarmerRelatedToFarmBookOwner
+        Date dataDate
+        string stfsGid
     }
 
-    EmployeeCheckpoint {
+    FarmerRegistrationType {
+        number id PK
+        string code
+        string name
+    }
+
+    History {
+        string action
+        string actionBy
+        Date actionDate
+    }
+
+    MModule {
         number id PK
     }
 
-    EmployeeShiftPlan {
-        number id PK
-        Date startDate
-        Date endDate
-    }
-
-    EmployeeShift {
-        number id PK
-    }
-
-    Employee {
+    ProcurementRecord {
         number id PK
         string title
-        string firstname
-        string lastname
-        string nationalId
-        string accountNumber
-        string rawType
-        string level
-        string educationLevel
-        number salaryAmount
-        number positionAllowanceAmount
-        number compensationAmount
+        string submissionId
+        string jotFormSubmissionId
+        Date fillDate
+        string referenceNo
+        int type
+        string farmerPersonCode
+        string teamCode
+        string userCode
+        string verifiedBy
+        string verifiedByName
+        Date verifiedDate
+        Date firstAssignedDate
+        string firstAssignedTo
+        Date latestAssignedDate
+        boolean isVendorInvalid
+        boolean isVendorVerified
+        boolean isBypass
+        boolean isPendingVerified
+        string status
+        number statusFlag
+        string assignee
+        Date dataDate
     }
 
-    FaceScanRequest {
-        number id PK
-        enum type
-        string remark
+    ReferenceDocument {
+        string id PK
+        string fileName
+        string fileType
+        string url
+        string fileId
+        boolean isDeletable
+        boolean confirmed
+        Date dataDate
+        string status
+        number statusFlag
     }
 
-    Holiday {
+    ReferenceInfo {
         number id PK
-        string name
-        string description
-        Date eventDate
-        string year
+        ReferenceInfoTypeEnum infoType
+        string field
+        string value
+        number correctionPercent
     }
 
-    LeaveDayTxn {
+    RpaUser {
         number id PK
-        Date actionDate
-        boolean isHalf
-    }
-
-    LeaveRequest {
-        number id PK
-        string leaveNo
-        Date startDate
-        Date endDate
-        false nullable
-        enum type
-        string remark
-    }
-
-    PaySlipGroup {
-        number id PK
-        Date roundDate
-        Date transferDate
-        enum type
-        Date uploadDateTime
-        string documentName
-        number totalSuccessRecord
-        number totalRecord
-    }
-
-    PaySlipItem {
-        number id PK
-        ColumnTopicCache topicCache
-        PaySlipItemTypeEnum type
-        number amount
-    }
-
-    PaySlip {
-        number id PK
-        Date roundDate
-        Date transferDate
-        enum type
-        number totalIncomeAmount
-        number totalDeductionAmount
-        number grantTotalAmount
-        EmployeeCache employeeCache
-        EmployeeCache payer
-    }
-
-    PositionSlotTxn {
-        number id PK
-        Date actionDate
-        enum type
-        string remark
-        PositionSlotCache positionSlotCache
-    }
-
-    PositionSlot {
-        number id PK
-        string name
-        string positionNo
+        string phone
         string code
-        boolean isTransfer
+        string accountName
         boolean isActive
-        string_array levelList
+        simple_array type
     }
 
-    PositionTxn {
-        number id PK
-        Date actionDate
-        PositionSlotCache positionSlotCache
-        number salaryAmount
-        number positionAllowanceAmount
-        number compensationAmount
-        PositionTxnTypeEnum type
-        EmployeeCache employeeCache
-        string remark
-    }
-
-    PositionType {
+    RubberVariety {
         number id PK
         string name
-        string_array levelList
+        number countryId
+        number stfsId
     }
 
-    Position {
+    SelectedReferenceInfo {
+        number procurementRecordId PK
+    }
+
+    SubModule {
         number id PK
         string code
         string name
-        string type
-        number positionTypeId
-        EmployeeTypeEnum employeeType
     }
 
-    SalaryDocTemplateItem {
-        number id PK
-        string columnName
+    Task {
+        string id PK
+        string serialNo
+        string referenceNo
+        string title
+        string activityName
+        Date assignedDate
+        Date dueDate
+        number taskAssigning
+        string moduleCode
+        number moduleId
+        string subModuleCode
+        number subModuleId
     }
 
-    SalaryDocTemplate {
-        number id PK
-        enum type
-        number startRow
-    }
-
-    SalaryTxn {
-        number id PK
-        Date actionDate
-        number salaryAmount
-        number positionAllowanceAmount
-        number compensationAmount
-        EmployeeCache employeeCache
-        string remark
-        enum type
-    }
-
-    Shift {
-        number id PK
-        string name
-        false nullable
-        string startWorkingTime
-        string endWorkingTime
-        string lateWorkingTime
-    }
-
-    TemporaryAssignmentTxn {
-        number id PK
-        Date actionDate
-        Date startDate
-        Date endDate
-        TemporaryAssignmentTypeEnum type
-        EmployeeCache employeeCache
-        PositionCache positionCache
-        OrgUnitCache orgUnitCache
-        string remark
-    }
-
-    TimeAttendance {
-        number id PK
-        Date authenDateTime
-        false nullable
-        Date workingDateTime
-        CheckpointCache checkpoint
-    }
-
-    ActionTxn ||--o{ PositionTxn : "positionTxnList"
-    ActionTxn ||--o{ SalaryTxn : "salaryTxnList"
-    DHrUser ||--|| Employee : "employee"
-    EmployeeAlias }o--|| Employee : "employee"
-    EmployeeCheckpoint }o--|| Employee : "employee"
-    EmployeeShift }o--|| Shift : "shift"
-    EmployeeShift }o--|| Employee : "employee"
-    Employee ||--o{ PaySlip : "paySlipList"
-    Employee ||--o{ EmployeeAlias : "aliasList"
-    Employee ||--o{ LeaveRequest : "leaveRequestList"
-    Employee ||--o{ EmployeeShift : "employeeShiftList"
-    Employee ||--|| DHrUser : "dHrUser"
-    Employee ||--|| PositionSlot : "positionSlot"
-    FaceScanRequest }o--|| Employee : "employee"
-    LeaveDayTxn }o--|| LeaveRequest : "leaveRequest"
-    LeaveRequest ||--o{ LeaveDayTxn : "leaveDayTxnList"
-    LeaveRequest }o--|| Employee : "employee"
-    PaySlipGroup ||--o{ PaySlip : "paySlipList"
-    PaySlipItem }o--|| PaySlip : "paySlip"
-    PaySlip ||--o{ PaySlipItem : "itemList"
-    PaySlip }o--|| Employee : "employee"
-    PaySlip }o--|| PaySlipGroup : "paySlipGroup"
-    PositionSlotTxn }o--|| ActionTxn : "actionTxn"
-    PositionSlot }o--|| Position : "position"
-    PositionSlot ||--|| Employee : "employee"
-    PositionTxn }o--|| ActionTxn : "actionTxn"
-    PositionType ||--o{ Position : "positionList"
-    Position ||--o{ PositionSlot : "positionSlotList"
-    Position }o--|| PositionType : "positionType"
-    SalaryTxn }o--|| ActionTxn : "actionTxn"
-    Shift ||--o{ EmployeeShift : "employeeShiftList"
-    TimeAttendance }o--|| Employee : "employee"
+    Action }o--|| MModule : "e"
+    Action }o--|| SubModule : "e"
+    Action }o--|| Activity : "e"
+    ActivityLog }o--|| ProcurementRecord : "e"
+    ActivityLog }o--|| FarmerLand : "e"
+    Activity }o--|| MModule : "e"
+    Activity }o--|| SubModule : "e"
+    Activity ||--o{ Action : "actionList"
+    CertificateDocumentType }o--|| MModule : "e"
+    CertificateDocumentType }o--|| MModule : "e"
+    DocumentType }o--|| MModule : "e"
+    DocumentType }o--|| SubModule : "e"
+    DocumentType ||--o{ ReferenceDocument : "referenceDocumentList"
+    FarmerLand ||--o{ ActivityLog : "activityLogList"
+    FarmerLand ||--o{ ReferenceDocument : "referenceDocumentList"
+    FarmerRegistrationType }o--|| MModule : "e"
+    FarmerRegistrationType }o--|| MModule : "e"
+    ProcurementRecord }o--|| FarmerInfo : "e"
+    ProcurementRecord ||--o{ FarmerLand : "farmerLandList"
+    ProcurementRecord ||--o{ ActivityLog : "activityLogList"
+    ProcurementRecord ||--o{ ReferenceDocument : "referenceDocumentList"
+    ReferenceDocument }o--|| ProcurementRecord : "e"
+    ReferenceDocument }o--|| FarmerLand : "e"
+    ReferenceDocument }o--|| FarmerInfo : "e"
+    ReferenceDocument }o--|| DocumentType : "e"
+    RpaUser ||--o{ ActivityLog : "activityList"
+    SubModule }o--|| MModule : "e"
+    SubModule ||--o{ DocumentType : "documentTypeList"
+    SubModule ||--o{ FarmerRegistrationType : "farmerRegistrationTypeList"
+    SubModule ||--o{ CertificateDocumentType : "certificateDocumentTypeList"
+    SubModule ||--o{ Activity : "activityList"
+    SubModule ||--o{ Action : "actionList"
